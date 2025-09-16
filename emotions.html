@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,11 +115,6 @@
             <path id="angerLine1" d="M 180 120 L 190 140" stroke="#333" stroke-width="3" opacity="0"/>
             <path id="angerLine2" d="M 210 120 L 220 140" stroke="#333" stroke-width="3" opacity="0"/>
             <path id="angerLine3" d="M 195 125 L 205 145" stroke="#333" stroke-width="3" opacity="0"/>
-            
-            <!-- Joy sparkles -->
-            <polygon id="sparkle1" points="180,100 185,115 200,115 190,125 195,140 180,130 165,140 170,125 160,115 175,115" fill="yellow" opacity="0"/>
-            <polygon id="sparkle2" points="220,100 225,115 240,115 230,125 235,140 220,130 205,140 210,125 200,115 215,115" fill="yellow" opacity="0"/>
-            <polygon id="sparkle3" points="200,300 205,315 220,315 210,325 215,340 200,330 185,340 190,325 180,315 195,315" fill="yellow" opacity="0"/>
         </svg>
         
         <div class="controls">
@@ -151,9 +147,6 @@
         const angerLine1 = document.getElementById('angerLine1');
         const angerLine2 = document.getElementById('angerLine2');
         const angerLine3 = document.getElementById('angerLine3');
-        const sparkle1 = document.getElementById('sparkle1');
-        const sparkle2 = document.getElementById('sparkle2');
-        const sparkle3 = document.getElementById('sparkle3');
         const emotionTitle = document.getElementById('emotionTitle');
         const particlesContainer = document.getElementById('particles');
         
@@ -178,7 +171,6 @@
                 blush: true,
                 tears: false,
                 angerLines: false,
-                sparkles: true,
                 title: 'Happy 😊',
                 bgColor: 'linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%)'
             },
@@ -192,7 +184,6 @@
                 blush: false,
                 tears: true,
                 angerLines: false,
-                sparkles: false,
                 title: 'Sad 😢',
                 bgColor: 'linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%)'
             },
@@ -206,7 +197,6 @@
                 blush: false,
                 tears: false,
                 angerLines: true,
-                sparkles: false,
                 title: 'Angry 😠',
                 bgColor: 'linear-gradient(135deg, #FA8BFF 0%, #2BD2FF 52%, #2BFF88 100%)'
             },
@@ -220,7 +210,6 @@
                 blush: false,
                 tears: false,
                 angerLines: false,
-                sparkles: false,
                 title: 'Surprised 😮',
                 bgColor: 'linear-gradient(135deg, #F093FB 0%, #F5576C 100%)'
             },
@@ -234,7 +223,6 @@
                 blush: true,
                 tears: false,
                 angerLines: false,
-                sparkles: true,
                 title: 'In Love 😍',
                 bgColor: 'linear-gradient(135deg, #FAD0C4 0%, #FF9A9E 100%)'
             },
@@ -248,7 +236,6 @@
                 blush: false,
                 tears: false,
                 angerLines: false,
-                sparkles: false,
                 title: 'Sleepy 😴',
                 bgColor: 'linear-gradient(135deg, #B5EAD7 0%, #C7CEEA 100%)'
             }
@@ -292,11 +279,6 @@
             angerLine1.style.opacity = emotion.angerLines ? '1' : '0';
             angerLine2.style.opacity = emotion.angerLines ? '1' : '0';
             angerLine3.style.opacity = emotion.angerLines ? '1' : '0';
-            
-            // Update sparkles
-            sparkle1.style.opacity = emotion.sparkles ? '1' : '0';
-            sparkle2.style.opacity = emotion.sparkles ? '1' : '0';
-            sparkle3.style.opacity = emotion.sparkles ? '1' : '0';
             
             // Update title
             emotionTitle.textContent = emotion.title;
@@ -376,25 +358,6 @@
             }
         }
         
-        // Add sparkle animation
-        function animateSparkles() {
-            const sparkles = [sparkle1, sparkle2, sparkle3];
-            sparkles.forEach(sparkle => {
-                if (parseFloat(sparkle.style.opacity) > 0) {
-                    sparkle.animate([
-                        { transform: 'scale(1)', opacity: 1 },
-                        { transform: 'scale(1.5)', opacity: 0.7 },
-                        { transform: 'scale(1)', opacity: 1 }
-                    ], {
-                        duration: 1000,
-                        iterations: Infinity,
-                        direction: 'alternate',
-                        easing: 'ease-in-out'
-                    });
-                }
-            });
-        }
-        
         // Add tear animation
         function animateTears() {
             const tears = [leftTear, rightTear];
@@ -414,7 +377,6 @@
         
         // Initialize
         setEmotion('happy');
-        animateSparkles();
         animateTears();
         
         // Button event listeners
@@ -458,3 +420,4 @@
     </script>
 </body>
 </html>
+```
