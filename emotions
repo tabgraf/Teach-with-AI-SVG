@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion SVG Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        
+        .emotion-title {
+            color: white;
+            font-size: 2.5rem;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.5s ease;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+        
+        button.active {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.05);
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="emotion-title" id="emotionTitle">Emotions</h1>
+        <svg id="emotionSVG" width="400" height="400" viewBox="0 0 400 400">
+            <!-- Face container -->
+            <circle id="face" cx="200" cy="200" r="150" fill="#FFDE59" stroke="#333" stroke-width="2"/>
+            
+            <!-- Eyes -->
+            <circle id="leftEye" cx="150" cy="170" r="20" fill="#333"/>
+            <circle id="rightEye" cx="250" cy="170" r="20" fill="#333"/>
+            
+            <!-- Eyeballs -->
+            <circle id="leftEyeball" cx="150" cy="170" r="8" fill="white"/>
+            <circle id="rightEyeball" cx="250" cy="170" r="8" fill="white"/>
+            
+            <!-- Mouth -->
+            <path id="mouth" d="M 150 250 Q 200 280 250 250" stroke="#333" stroke-width="4" fill="none"/>
+            
+            <!-- Eyebrows -->
+            <path id="leftEyebrow" d="M 130 140 Q 150 130 170 140" stroke="#333" stroke-width="4" fill="none"/>
+            <path id="rightEyebrow" d="M 230 140 Q 250 130 270 140" stroke="#333" stroke-width="4" fill="none"/>
+            
+            <!-- Blush -->
+            <circle id="leftBlush" cx="120" cy="200" r="25" fill="rgba(255,105,180,0.3)" opacity="0"/>
+            <circle id="rightBlush" cx="280" cy="200" r="25" fill="rgba(255,105,180,0.3)" opacity="0"/>
+            
+            <!-- Tears -->
+            <path id="leftTear" d="M 150 190 Q 145 220 150 250 Q 155 220 150 190" fill="rgba(173,216,230,0.8)" opacity="0"/>
+            <path id="rightTear" d="M 250 190 Q 245 220 250 250 Q 255 220 250 190" fill="rgba(173,216,230,0.8)" opacity="0"/>
+            
+            <!-- Anger lines -->
+            <path id="angerLine1" d="M 180 120 L 190 140" stroke="#333" stroke-width="3" opacity="0"/>
+            <path id="angerLine2" d="M 210 120 L 220 140" stroke="#333" stroke-width="3" opacity="0"/>
+            <path id="angerLine3" d="M 195 125 L 205 145" stroke="#333" stroke-width="3" opacity="0"/>
+            
+            <!-- Joy sparkles -->
+            <polygon id="sparkle1" points="180,100 185,115 200,115 190,125 195,140 180,130 165,140 170,125 160,115 175,115" fill="yellow" opacity="0"/>
+            <polygon id="sparkle2" points="220,100 225,115 240,115 230,125 235,140 220,130 205,140 210,125 200,115 215,115" fill="yellow" opacity="0"/>
+            <polygon id="sparkle3" points="200,300 205,315 220,315 210,325 215,340 200,330 185,340 190,325 180,315 195,315" fill="yellow" opacity="0"/>
+        </svg>
+        
+        <div class="controls">
+            <button id="happyBtn">Happy 😊</button>
+            <button id="sadBtn">Sad 😢</button>
+            <button id="angryBtn">Angry 😠</button>
+            <button id="surprisedBtn">Surprised 😮</button>
+            <button id="loveBtn">In Love 😍</button>
+            <button id="sleepyBtn">Sleepy 😴</button>
+            <button id="randomBtn">Random 🎲</button>
+        </div>
+    </div>
+    
+    <div class="particles" id="particles"></div>
+
+    <script>
+        // Elements
+        const face = document.getElementById('face');
+        const leftEye = document.getElementById('leftEye');
+        const rightEye = document.getElementById('rightEye');
+        const leftEyeball = document.getElementById('leftEyeball');
+        const rightEyeball = document.getElementById('rightEyeball');
+        const mouth = document.getElementById('mouth');
+        const leftEyebrow = document.getElementById('leftEyebrow');
+        const rightEyebrow = document.getElementById('rightEyebrow');
+        const leftBlush = document.getElementById('leftBlush');
+        const rightBlush = document.getElementById('rightBlush');
+        const leftTear = document.getElementById('leftTear');
+        const rightTear = document.getElementById('rightTear');
+        const angerLine1 = document.getElementById('angerLine1');
+        const angerLine2 = document.getElementById('angerLine2');
+        const angerLine3 = document.getElementById('angerLine3');
+        const sparkle1 = document.getElementById('sparkle1');
+        const sparkle2 = document.getElementById('sparkle2');
+        const sparkle3 = document.getElementById('sparkle3');
+        const emotionTitle = document.getElementById('emotionTitle');
+        const particlesContainer = document.getElementById('particles');
+        
+        // Buttons
+        const happyBtn = document.getElementById('happyBtn');
+        const sadBtn = document.getElementById('sadBtn');
+        const angryBtn = document.getElementById('angryBtn');
+        const surprisedBtn = document.getElementById('surprisedBtn');
+        const loveBtn = document.getElementById('loveBtn');
+        const sleepyBtn = document.getElementById('sleepyBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        
+        // Emotion states
+        const emotions = {
+            happy: {
+                faceColor: '#FFDE59',
+                mouth: 'M 150 250 Q 200 280 250 250',
+                leftEye: { cy: 170, r: 20 },
+                rightEye: { cy: 170, r: 20 },
+                leftEyebrow: 'M 130 140 Q 150 130 170 140',
+                rightEyebrow: 'M 230 140 Q 250 130 270 140',
+                blush: true,
+                tears: false,
+                angerLines: false,
+                sparkles: true,
+                title: 'Happy 😊',
+                bgColor: 'linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%)'
+            },
+            sad: {
+                faceColor: '#A0C4FF',
+                mouth: 'M 150 280 Q 200 250 250 280',
+                leftEye: { cy: 170, r: 20 },
+                rightEye: { cy: 170, r: 20 },
+                leftEyebrow: 'M 130 150 Q 150 160 170 150',
+                rightEyebrow: 'M 230 150 Q 250 160 270 150',
+                blush: false,
+                tears: true,
+                angerLines: false,
+                sparkles: false,
+                title: 'Sad 😢',
+                bgColor: 'linear-gradient(135deg, #8EC5FC 0%, #E0C3FC 100%)'
+            },
+            angry: {
+                faceColor: '#FF6B6B',
+                mouth: 'M 150 270 L 250 270',
+                leftEye: { cy: 170, r: 15 },
+                rightEye: { cy: 170, r: 15 },
+                leftEyebrow: 'M 130 150 Q 150 140 170 150',
+                rightEyebrow: 'M 230 150 Q 250 140 270 150',
+                blush: false,
+                tears: false,
+                angerLines: true,
+                sparkles: false,
+                title: 'Angry 😠',
+                bgColor: 'linear-gradient(135deg, #FA8BFF 0%, #2BD2FF 52%, #2BFF88 100%)'
+            },
+            surprised: {
+                faceColor: '#FFD93D',
+                mouth: 'M 180 270 A 20 20 0 1 1 220 270',
+                leftEye: { cy: 160, r: 25 },
+                rightEye: { cy: 160, r: 25 },
+                leftEyebrow: 'M 130 130 Q 150 120 170 130',
+                rightEyebrow: 'M 230 130 Q 250 120 270 130',
+                blush: false,
+                tears: false,
+                angerLines: false,
+                sparkles: false,
+                title: 'Surprised 😮',
+                bgColor: 'linear-gradient(135deg, #F093FB 0%, #F5576C 100%)'
+            },
+            love: {
+                faceColor: '#FF9A9E',
+                mouth: 'M 180 270 Q 200 290 220 270',
+                leftEye: { cy: 170, r: 25 },
+                rightEye: { cy: 170, r: 25 },
+                leftEyebrow: 'M 130 140 Q 150 130 170 140',
+                rightEyebrow: 'M 230 140 Q 250 130 270 140',
+                blush: true,
+                tears: false,
+                angerLines: false,
+                sparkles: true,
+                title: 'In Love 😍',
+                bgColor: 'linear-gradient(135deg, #FAD0C4 0%, #FF9A9E 100%)'
+            },
+            sleepy: {
+                faceColor: '#B5EAD7',
+                mouth: 'M 170 270 Q 200 275 230 270',
+                leftEye: { cy: 175, r: 15 },
+                rightEye: { cy: 175, r: 15 },
+                leftEyebrow: 'M 135 160 Q 150 165 165 160',
+                rightEyebrow: 'M 235 160 Q 250 165 265 160',
+                blush: false,
+                tears: false,
+                angerLines: false,
+                sparkles: false,
+                title: 'Sleepy 😴',
+                bgColor: 'linear-gradient(135deg, #B5EAD7 0%, #C7CEEA 100%)'
+            }
+        };
+        
+        // Set emotion function
+        function setEmotion(emotionName) {
+            const emotion = emotions[emotionName];
+            
+            // Update face
+            face.setAttribute('fill', emotion.faceColor);
+            
+            // Update eyes
+            leftEye.setAttribute('cy', emotion.leftEye.cy);
+            leftEye.setAttribute('r', emotion.leftEye.r);
+            rightEye.setAttribute('cy', emotion.rightEye.cy);
+            rightEye.setAttribute('r', emotion.rightEye.r);
+            
+            // Update eyeballs
+            leftEyeball.setAttribute('cy', emotion.leftEye.cy);
+            rightEyeball.setAttribute('cy', emotion.rightEye.cy);
+            leftEyeball.setAttribute('r', emotion.leftEye.r * 0.4);
+            rightEyeball.setAttribute('r', emotion.rightEye.r * 0.4);
+            
+            // Update mouth
+            mouth.setAttribute('d', emotion.mouth);
+            
+            // Update eyebrows
+            leftEyebrow.setAttribute('d', emotion.leftEyebrow);
+            rightEyebrow.setAttribute('d', emotion.rightEyebrow);
+            
+            // Update blush
+            leftBlush.style.opacity = emotion.blush ? '1' : '0';
+            rightBlush.style.opacity = emotion.blush ? '1' : '0';
+            
+            // Update tears
+            leftTear.style.opacity = emotion.tears ? '1' : '0';
+            rightTear.style.opacity = emotion.tears ? '1' : '0';
+            
+            // Update anger lines
+            angerLine1.style.opacity = emotion.angerLines ? '1' : '0';
+            angerLine2.style.opacity = emotion.angerLines ? '1' : '0';
+            angerLine3.style.opacity = emotion.angerLines ? '1' : '0';
+            
+            // Update sparkles
+            sparkle1.style.opacity = emotion.sparkles ? '1' : '0';
+            sparkle2.style.opacity = emotion.sparkles ? '1' : '0';
+            sparkle3.style.opacity = emotion.sparkles ? '1' : '0';
+            
+            // Update title
+            emotionTitle.textContent = emotion.title;
+            
+            // Update background
+            document.body.style.background = emotion.bgColor;
+            
+            // Animate the change
+            face.style.transition = 'all 0.5s ease';
+            leftEye.style.transition = 'all 0.5s ease';
+            rightEye.style.transition = 'all 0.5s ease';
+            mouth.style.transition = 'all 0.5s ease';
+            leftEyebrow.style.transition = 'all 0.5s ease';
+            rightEyebrow.style.transition = 'all 0.5s ease';
+            
+            // Create emotion particles
+            createParticles(emotionName);
+            
+            // Update active button
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(emotionName + 'Btn').classList.add('active');
+        }
+        
+        // Create particles for emotions
+        function createParticles(emotion) {
+            // Clear existing particles
+            particlesContainer.innerHTML = '';
+            
+            const colors = {
+                happy: ['#FFD700', '#FFA500', '#FF4500'],
+                sad: ['#87CEEB', '#4682B4', '#1E90FF'],
+                angry: ['#FF4500', '#DC143C', '#8B0000'],
+                surprised: ['#FFD700', '#FFFF00', '#FFA500'],
+                love: ['#FF69B4', '#FF1493', '#C71585'],
+                sleepy: ['#ADD8E6', '#87CEEB', '#4682B4']
+            };
+            
+            const particleCount = 20;
+            const selectedColors = colors[emotion] || ['#FFFFFF'];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.borderRadius = '50%';
+                particle.style.backgroundColor = selectedColors[Math.floor(Math.random() * selectedColors.length)];
+                particle.style.opacity = Math.random() * 0.7 + 0.3;
+                particle.style.boxShadow = '0 0 10px currentColor';
+                
+                // Random position
+                const startX = Math.random() * window.innerWidth;
+                const startY = window.innerHeight + 20;
+                
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                
+                // Animation
+                const animationDuration = Math.random() * 3 + 2;
+                const moveDistance = Math.random() * 200 + 100;
+                const moveDirection = Math.random() > 0.5 ? 1 : -1;
+                
+                particle.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 0.7 },
+                    { transform: `translate(${moveDirection * moveDistance}px, -${window.innerHeight + 100}px) rotate(${360 * moveDirection}deg)`, opacity: 0 }
+                ], {
+                    duration: animationDuration * 1000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                });
+                
+                particlesContainer.appendChild(particle);
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, animationDuration * 1000);
+            }
+        }
+        
+        // Add sparkle animation
+        function animateSparkles() {
+            const sparkles = [sparkle1, sparkle2, sparkle3];
+            sparkles.forEach(sparkle => {
+                if (parseFloat(sparkle.style.opacity) > 0) {
+                    sparkle.animate([
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: 'scale(1.5)', opacity: 0.7 },
+                        { transform: 'scale(1)', opacity: 1 }
+                    ], {
+                        duration: 1000,
+                        iterations: Infinity,
+                        direction: 'alternate',
+                        easing: 'ease-in-out'
+                    });
+                }
+            });
+        }
+        
+        // Add tear animation
+        function animateTears() {
+            const tears = [leftTear, rightTear];
+            tears.forEach(tear => {
+                if (parseFloat(tear.style.opacity) > 0) {
+                    tear.animate([
+                        { transform: 'translateY(0)' },
+                        { transform: 'translateY(20px)' }
+                    ], {
+                        duration: 2000,
+                        iterations: Infinity,
+                        easing: 'linear'
+                    });
+                }
+            });
+        }
+        
+        // Initialize
+        setEmotion('happy');
+        animateSparkles();
+        animateTears();
+        
+        // Button event listeners
+        happyBtn.addEventListener('click', () => setEmotion('happy'));
+        sadBtn.addEventListener('click', () => setEmotion('sad'));
+        angryBtn.addEventListener('click', () => setEmotion('angry'));
+        surprisedBtn.addEventListener('click', () => setEmotion('surprised'));
+        loveBtn.addEventListener('click', () => setEmotion('love'));
+        sleepyBtn.addEventListener('click', () => setEmotion('sleepy'));
+        randomBtn.addEventListener('click', () => {
+            const emotionKeys = Object.keys(emotions);
+            const randomEmotion = emotionKeys[Math.floor(Math.random() * emotionKeys.length)];
+            setEmotion(randomEmotion);
+        });
+        
+        // Add eye movement on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const rect = document.querySelector('svg').getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const mouseX = e.clientX - centerX;
+            const mouseY = e.clientY - centerY;
+            
+            const maxMovement = 10;
+            const moveX = (mouseX / rect.width) * maxMovement;
+            const moveY = (mouseY / rect.height) * maxMovement;
+            
+            leftEyeball.setAttribute('cx', 150 + moveX);
+            rightEyeball.setAttribute('cx', 250 + moveX);
+            leftEyeball.setAttribute('cy', parseFloat(leftEye.getAttribute('cy')) + moveY);
+            rightEyeball.setAttribute('cy', parseFloat(rightEye.getAttribute('cy')) + moveY);
+        });
+        
+        // Auto-change emotion every 10 seconds
+        setInterval(() => {
+            const emotionKeys = Object.keys(emotions);
+            const randomEmotion = emotionKeys[Math.floor(Math.random() * emotionKeys.length)];
+            setEmotion(randomEmotion);
+        }, 10000);
+    </script>
+</body>
+</html>
