@@ -1,4 +1,4 @@
-# 🎓 TeachWithSVGAI
+# 🎓 Teach With AI generated SVGs
 
 Educational **SVG Animations** powered by simple HTML files.  
 Learn and teach concepts with engaging visuals! ✨
