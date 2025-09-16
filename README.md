@@ -10,6 +10,10 @@ Learn and teach concepts with engaging visuals! ✨
 
 ---
 
+## 🌟 Live Demo
+Check it out here:  
+👉 [TeachWithSVGAI Demo](https://tabgraf.github.io/Teach-with-AI-SVG/)
+
 ## ▶️ How to Run
 You only need an HTTP server to get started:
 
