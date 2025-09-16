@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Parts Animation for Kindergarten</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #87CEEB;
+            margin: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            background-color: #8FBC8F;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .label {
+            font-size: 24px;
+            font-weight: bold;
+            fill: #333;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .highlight {
+            fill: #FF6B6B !important;
+            stroke: #FF0000 !important;
+            stroke-width: 4 !important;
+            filter: drop-shadow(0 0 5px #FF6B6B);
+        }
+        .tree-part {
+            cursor: pointer;
+            transition: fill 0.3s;
+        }
+        .sun {
+            fill: #FFD700;
+        }
+        .cloud {
+            fill: white;
+        }
+        .ground {
+            fill: #8B4513;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        .branches-path {
+            stroke-width: 12 !important;
+            stroke: #5D2906;
+        }
+        .highlight-branches {
+            stroke: #FF0000 !important;
+            stroke-width: 16 !important;
+            filter: drop-shadow(0 0 5px #FF6B6B);
+        }
+        .flower {
+            filter: drop-shadow(0 0 3px #FF69B4);
+        }
+        .highlight-flower {
+            fill: #FF00FF !important;
+            filter: drop-shadow(0 0 10px #FF00FF) !important;
+            /* Removed animation that caused bouncing */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Let's Learn About Tree Parts!</h1>
+        <svg width="800" height="600" viewBox="0 0 800 600">
+            <!-- Sun -->
+            <circle class="sun" cx="700" cy="80" r="40">
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            
+            <!-- Clouds -->
+            <ellipse class="cloud" cx="100" cy="60" rx="50" ry="30">
+                <animate attributeName="cx" from="100" to="800" dur="20s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse class="cloud" cx="130" cy="50" rx="40" ry="25">
+                <animate attributeName="cx" from="130" to="830" dur="20s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse class="cloud" cx="80" cy="50" rx="40" ry="25">
+                <animate attributeName="cx" from="80" to="780" dur="20s" repeatCount="indefinite"/>
+            </ellipse>
+            
+            <!-- Ground -->
+            <rect class="ground" x="0" y="450" width="800" height="150"/>
+            
+            <!-- Roots -->
+            <path id="roots" class="tree-part" d="M380,450 Q360,480 340,470 Q320,500 300,480 Q280,510 260,490 M420,450 Q440,480 460,470 Q480,500 500,480 Q520,510 540,490 M400,450 Q400,490 380,510 Q400,530 420,510 Q400,490 400,450" fill="#8B4513" stroke="#5D2906" stroke-width="3"/>
+            <text id="roots-label" class="label" x="400" y="550">ROOTS - Drink water from the soil</text>
+            
+            <!-- Trunk -->
+            <rect id="trunk" class="tree-part" x="370" y="250" width="60" height="200" fill="#8B4513" stroke="#5D2906" stroke-width="3"/>
+            <text id="trunk-label" class="label" x="400" y="350">TRUNK - Carries water to the leaves</text>
+            
+            <!-- Branches -->
+            <path id="branches" class="tree-part branches-path" d="M370,250 Q320,220 280,180 M430,250 Q480,220 520,180 M390,230 Q370,210 350,190 M410,230 Q430,210 450,190" fill="none" stroke="#5D2906" stroke-width="12"/>
+            <text id="branches-label" class="label" x="400" y="170">BRANCHES - Hold up the leaves</text>
+            
+            <!-- Leaves -->
+            <ellipse id="leaves" class="tree-part" cx="400" cy="150" rx="120" ry="100" fill="#228B22"/>
+            <circle class="tree-part leaf" cx="320" cy="120" r="25" fill="#32CD32">
+                <animate attributeName="cy" values="120;115;120" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="tree-part leaf" cx="480" cy="130" r="30" fill="#32CD32">
+                <animate attributeName="cy" values="130;125;130" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="tree-part leaf" cx="400" cy="80" r="35" fill="#32CD32">
+                <animate attributeName="cy" values="80;75;80" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="tree-part leaf" cx="350" cy="160" r="28" fill="#32CD32">
+                <animate attributeName="cy" values="160;155;160" dur="2.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="tree-part leaf" cx="450" cy="170" r="32" fill="#32CD32">
+                <animate attributeName="cy" values="170;165;170" dur="2.7s" repeatCount="indefinite"/>
+            </circle>
+            <text id="leaves-label" class="label" x="400" y="60">LEAVES - Make food from sunlight</text>
+            
+            <!-- Flowers (without bouncing animation) -->
+            <circle id="flower1" class="tree-part flower" cx="330" cy="140" r="15" fill="#FF69B4"/>
+            <circle id="flower2" class="tree-part flower" cx="470" cy="110" r="12" fill="#FF69B4"/>
+            <circle id="flower3" class="tree-part flower" cx="380" cy="100" r="10" fill="#FF69B4"/>
+            <text id="flowers-label" class="label" x="400" y="40">FLOWERS - Become fruits and seeds</text>
+        </svg>
+        
+        <div>
+            <button id="roots-btn">Show Roots</button>
+            <button id="trunk-btn">Show Trunk</button>
+            <button id="branches-btn">Show Branches</button>
+            <button id="leaves-btn">Show Leaves</button>
+            <button id="flowers-btn">Show Flowers</button>
+            <button id="reset-btn">Reset All</button>
+        </div>
+    </div>
+
+    <script>
+        // Animation functions
+        function highlightPart(partId, labelId) {
+            // Reset all parts first
+            resetAllParts();
+            
+            // Highlight the selected part
+            const part = document.getElementById(partId);
+            const label = document.getElementById(labelId);
+            
+            if (part) {
+                // Special handling for branches
+                if (partId === 'branches') {
+                    part.classList.add('highlight-branches');
+                } 
+                // Special handling for flowers
+                else if (partId === 'flower1' || partId === 'flower2' || partId === 'flower3') {
+                    document.querySelectorAll('.flower').forEach(flower => {
+                        flower.classList.add('highlight-flower');
+                    });
+                } else {
+                    part.classList.add('highlight');
+                }
+            }
+            
+            if (label) {
+                label.style.opacity = "1";
+            }
+        }
+        
+        function resetAllParts() {
+            // Remove highlight from all tree parts
+            const treeParts = document.querySelectorAll('.tree-part');
+            treeParts.forEach(part => {
+                part.classList.remove('highlight');
+                part.classList.remove('highlight-branches');
+                part.classList.remove('highlight-flower');
+            });
+            
+            // Hide all labels
+            const labels = document.querySelectorAll('.label');
+            labels.forEach(label => {
+                label.style.opacity = "0";
+            });
+        }
+        
+        // Set up button event listeners
+        document.getElementById('roots-btn').addEventListener('click', () => {
+            highlightPart('roots', 'roots-label');
+        });
+        
+        document.getElementById('trunk-btn').addEventListener('click', () => {
+            highlightPart('trunk', 'trunk-label');
+        });
+        
+        document.getElementById('branches-btn').addEventListener('click', () => {
+            highlightPart('branches', 'branches-label');
+        });
+        
+        document.getElementById('leaves-btn').addEventListener('click', () => {
+            highlightPart('leaves', 'leaves-label');
+        });
+        
+        document.getElementById('flowers-btn').addEventListener('click', () => {
+            // Highlight all flowers
+            document.getElementById('flower1').classList.add('highlight-flower');
+            document.getElementById('flower2').classList.add('highlight-flower');
+            document.getElementById('flower3').classList.add('highlight-flower');
+            document.getElementById('flowers-label').style.opacity = "1";
+        });
+        
+        document.getElementById('reset-btn').addEventListener('click', resetAllParts);
+        
+        // Add click event to each tree part
+        document.querySelectorAll('.tree-part').forEach(part => {
+            part.addEventListener('click', function() {
+                // Map parts to their corresponding labels
+                const partMap = {
+                    'roots': 'roots-label',
+                    'trunk': 'trunk-label',
+                    'branches': 'branches-label',
+                    'leaves': 'leaves-label',
+                    'flower1': 'flowers-label',
+                    'flower2': 'flowers-label',
+                    'flower3': 'flowers-label'
+                };
+                
+                let labelId = null;
+                
+                // Check if the clicked element has an ID in our map
+                if (this.id && partMap[this.id]) {
+                    labelId = partMap[this.id];
+                    highlightPart(this.id, labelId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
