@@ -1,0 +1,505 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterfly Life Cycle Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            height: 4px;
+            background: #e0e0e0;
+            width: 100%;
+            z-index: 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 1;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            border-color: #667eea;
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        .progress-step.completed {
+            border-color: #764ba2;
+            background: #764ba2;
+        }
+
+        .stage-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        svg {
+            width: 100%;
+            max-width: 350px;
+            height: 250px;
+            margin: 20px 0;
+        }
+
+        svg.summary-view {
+            max-width: 100%;
+            height: 200px;
+        }
+
+        .stage-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .stage-info h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .stage-info p {
+            color: #444;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-prev {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-prev:not(:disabled):hover {
+            background: #d0d0d0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-next:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        @keyframes flutter {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes grow {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .stage-svg {
+            animation: grow 0.5s ease;
+        }
+
+        .egg { animation: grow 0.5s ease, wiggle 3s infinite 0.5s; transform-origin: center; }
+        .caterpillar { animation: grow 0.5s ease, wiggle 4s infinite 0.5s; transform-origin: center; }
+        .chrysalis { animation: grow 0.5s ease, wiggle 5s infinite 0.5s; transform-origin: center; }
+        .butterfly { animation: grow 0.5s ease, flutter 3s infinite 0.5s; transform-origin: center; }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦋 Butterfly Life Cycle Journey</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-line">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-step active" id="step0">🥚</div>
+            <div class="progress-step" id="step1">🐛</div>
+            <div class="progress-step" id="step2">🏠</div>
+            <div class="progress-step" id="step3">🦋</div>
+            <div class="progress-step" id="step4">🔄</div>
+        </div>
+
+        <div class="stage-container" id="stageContainer">
+            <svg id="stageSvg" viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+            </svg>
+            
+            <div class="stage-info" id="stageInfo">
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-prev" id="btnPrev" disabled>← Previous</button>
+            <button class="btn-next" id="btnNext">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        const totalStages = 5;
+
+        const stages = [
+            {
+                emoji: "🥚",
+                title: "Egg Stage",
+                description: "The butterfly life cycle begins when a female butterfly lays tiny eggs on a leaf. The eggs are usually oval-shaped and very small. Depending on the species, the egg stage lasts from a few days to several weeks. Inside the egg, a tiny caterpillar is developing!",
+                svg: `
+                    <g class="egg stage-svg">
+                        <ellipse cx="150" cy="125" rx="40" ry="60" fill="#e8f5e9" stroke="#4caf50" stroke-width="4"/>
+                        <ellipse cx="150" cy="115" rx="25" ry="35" fill="#c8e6c9" opacity="0.7"/>
+                        <ellipse cx="160" cy="110" rx="8" ry="12" fill="white" opacity="0.6"/>
+                    </g>
+                `
+            },
+            {
+                emoji: "🐛",
+                title: "Caterpillar (Larva) Stage",
+                description: "When the caterpillar hatches, it's tiny and hungry! Its main job is to eat and grow. Caterpillars molt (shed their skin) several times as they grow bigger. They spend most of their time munching on leaves, storing energy for their transformation. This stage typically lasts 2-5 weeks.",
+                svg: `
+                    <g class="caterpillar stage-svg">
+                        <path d="M 60 125 Q 80 105, 100 125 Q 120 145, 140 125 Q 160 105, 180 125 Q 200 145, 220 125" 
+                              fill="none" stroke="#8bc34a" stroke-width="25" stroke-linecap="round"/>
+                        <circle cx="230" cy="125" r="18" fill="#8bc34a"/>
+                        <circle cx="225" cy="120" r="4" fill="#000"/>
+                        <circle cx="238" cy="120" r="4" fill="#000"/>
+                        <path d="M 231 132 Q 231 137, 226 137" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="60" y1="118" x2="50" y2="108" stroke="#8bc34a" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="60" y1="132" x2="50" y2="142" stroke="#8bc34a" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+                `
+            },
+            {
+                emoji: "🏠",
+                title: "Chrysalis (Pupa) Stage",
+                description: "This is the most magical stage! The caterpillar forms a hard protective shell called a chrysalis. Inside, the caterpillar's body completely transforms through a process called metamorphosis. Its tissues break down and reorganize into a butterfly. This stage usually takes 10-14 days.",
+                svg: `
+                    <g class="chrysalis stage-svg">
+                        <ellipse cx="150" cy="135" rx="35" ry="70" fill="#90caf9" stroke="#1976d2" stroke-width="4"/>
+                        <path d="M 125 80 Q 150 65, 175 80" fill="none" stroke="#1976d2" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="120" y1="110" x2="145" y2="110" stroke="#1976d2" stroke-width="2.5"/>
+                        <line x1="122" y1="135" x2="147" y2="135" stroke="#1976d2" stroke-width="2.5"/>
+                        <line x1="124" y1="160" x2="149" y2="160" stroke="#1976d2" stroke-width="2.5"/>
+                        <line x1="155" y1="110" x2="180" y2="110" stroke="#1976d2" stroke-width="2.5"/>
+                        <line x1="153" y1="135" x2="178" y2="135" stroke="#1976d2" stroke-width="2.5"/>
+                        <line x1="151" y1="160" x2="176" y2="160" stroke="#1976d2" stroke-width="2.5"/>
+                    </g>
+                `
+            },
+            {
+                emoji: "🦋",
+                title: "Adult Butterfly Stage",
+                description: "Finally, the adult butterfly emerges! At first, its wings are soft and folded. The butterfly pumps fluid into its wings to expand them, then waits for them to dry and harden. Now it can fly! Adult butterflies drink nectar, find mates, and lay eggs to start the cycle again. Most live for 2-6 weeks.",
+                svg: `
+                    <g class="butterfly stage-svg">
+                        <ellipse cx="150" cy="125" rx="12" ry="40" fill="#333"/>
+                        <circle cx="150" cy="95" r="10" fill="#333"/>
+                        <line x1="144" y1="85" x2="135" y2="70" stroke="#333" stroke-width="2.5"/>
+                        <line x1="156" y1="85" x2="165" y2="70" stroke="#333" stroke-width="2.5"/>
+                        <circle cx="135" cy="70" r="3" fill="#333"/>
+                        <circle cx="165" cy="70" r="3" fill="#333"/>
+                        
+                        <ellipse cx="110" cy="105" rx="40" ry="55" fill="#ff6b9d" opacity="0.9" transform="rotate(-25 110 105)"/>
+                        <ellipse cx="118" cy="112" rx="28" ry="38" fill="#c2185b" opacity="0.7" transform="rotate(-25 118 112)"/>
+                        <ellipse cx="110" cy="145" rx="32" ry="45" fill="#ff6b9d" opacity="0.9" transform="rotate(25 110 145)"/>
+                        <ellipse cx="117" cy="142" rx="22" ry="32" fill="#c2185b" opacity="0.7" transform="rotate(25 117 142)"/>
+                        
+                        <ellipse cx="190" cy="105" rx="40" ry="55" fill="#ff6b9d" opacity="0.9" transform="rotate(25 190 105)"/>
+                        <ellipse cx="182" cy="112" rx="28" ry="38" fill="#c2185b" opacity="0.7" transform="rotate(25 182 112)"/>
+                        <ellipse cx="190" cy="145" rx="32" ry="45" fill="#ff6b9d" opacity="0.9" transform="rotate(-25 190 145)"/>
+                        <ellipse cx="183" cy="142" rx="22" ry="32" fill="#c2185b" opacity="0.7" transform="rotate(-25 183 142)"/>
+                        
+                        <circle cx="100" cy="100" r="4" fill="white" opacity="0.8"/>
+                        <circle cx="200" cy="100" r="4" fill="white" opacity="0.8"/>
+                    </g>
+                `
+            },
+            {
+                emoji: "🔄",
+                title: "Complete Life Cycle",
+                description: "You've completed the journey! The butterfly life cycle is a continuous circle of transformation. From a tiny egg to a crawling caterpillar, transforming in a chrysalis, and finally emerging as a beautiful butterfly that lays eggs to start the cycle all over again. This amazing process is called complete metamorphosis!",
+                svg: `
+                    <g class="summary stage-svg">
+                        <!-- Arrow 1 -->
+                        <g class="arrow">
+                            <line x1="140" y1="125" x2="180" y2="125" stroke="#667eea" stroke-width="3"/>
+                            <polygon points="180,125 170,120 170,130" fill="#667eea"/>
+                        </g>
+                        
+                        <!-- Egg -->
+                        <g class="egg" style="animation: grow 0.5s ease, wiggle 3s infinite 0.5s;">
+                            <ellipse cx="80" cy="125" rx="25" ry="35" fill="#e8f5e9" stroke="#4caf50" stroke-width="3"/>
+                            <ellipse cx="80" cy="120" rx="15" ry="20" fill="#c8e6c9" opacity="0.7"/>
+                            <text x="80" y="170" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">Egg</text>
+                        </g>
+
+                        <!-- Arrow 2 -->
+                        <g class="arrow">
+                            <line x1="340" y1="125" x2="380" y2="125" stroke="#667eea" stroke-width="3"/>
+                            <polygon points="380,125 370,120 370,130" fill="#667eea"/>
+                        </g>
+
+                        <!-- Caterpillar -->
+                        <g class="caterpillar" style="animation: grow 0.5s ease 0.3s backwards, wiggle 4s infinite 0.8s;">
+                            <path d="M 220 125 Q 230 115, 240 125 Q 250 135, 260 125 Q 270 115, 280 125" 
+                                  fill="none" stroke="#8bc34a" stroke-width="15" stroke-linecap="round"/>
+                            <circle cx="285" cy="125" r="10" fill="#8bc34a"/>
+                            <circle cx="283" cy="122" r="2" fill="#000"/>
+                            <circle cx="289" cy="122" r="2" fill="#000"/>
+                            <line x1="220" y1="120" x2="215" y2="115" stroke="#8bc34a" stroke-width="2"/>
+                            <line x1="220" y1="130" x2="215" y2="135" stroke="#8bc34a" stroke-width="2"/>
+                            <text x="250" y="170" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">Larva</text>
+                        </g>
+
+                        <!-- Arrow 3 -->
+                        <g class="arrow">
+                            <line x1="540" y1="125" x2="580" y2="125" stroke="#667eea" stroke-width="3"/>
+                            <polygon points="580,125 570,120 570,130" fill="#667eea"/>
+                        </g>
+
+                        <!-- Chrysalis -->
+                        <g class="chrysalis" style="animation: grow 0.5s ease 0.6s backwards, wiggle 5s infinite 1.1s;">
+                            <ellipse cx="460" cy="130" rx="20" ry="40" fill="#90caf9" stroke="#1976d2" stroke-width="3"/>
+                            <path d="M 450 100 Q 460 90, 470 100" fill="none" stroke="#1976d2" stroke-width="2"/>
+                            <line x1="440" y1="115" x2="455" y2="115" stroke="#1976d2" stroke-width="1.5"/>
+                            <line x1="442" y1="130" x2="457" y2="130" stroke="#1976d2" stroke-width="1.5"/>
+                            <line x1="444" y1="145" x2="459" y2="145" stroke="#1976d2" stroke-width="1.5"/>
+                            <text x="460" y="180" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">Pupa</text>
+                        </g>
+
+                        <!-- Butterfly -->
+                        <g class="butterfly" style="animation: grow 0.5s ease 0.9s backwards, flutter 3s infinite 1.4s;">
+                            <ellipse cx="680" cy="125" rx="8" ry="25" fill="#333"/>
+                            <circle cx="680" cy="107" r="6" fill="#333"/>
+                            <line x1="676" y1="100" x2="670" y2="90" stroke="#333" stroke-width="1.5"/>
+                            <line x1="684" y1="100" x2="690" y2="90" stroke="#333" stroke-width="1.5"/>
+                            
+                            <ellipse cx="655" cy="115" rx="25" ry="35" fill="#ff6b9d" opacity="0.8" transform="rotate(-20 655 115)"/>
+                            <ellipse cx="660" cy="120" rx="18" ry="25" fill="#c2185b" opacity="0.6" transform="rotate(-20 660 120)"/>
+                            <ellipse cx="655" cy="140" rx="20" ry="28" fill="#ff6b9d" opacity="0.8" transform="rotate(20 655 140)"/>
+                            
+                            <ellipse cx="705" cy="115" rx="25" ry="35" fill="#ff6b9d" opacity="0.8" transform="rotate(20 705 115)"/>
+                            <ellipse cx="700" cy="120" rx="18" ry="25" fill="#c2185b" opacity="0.6" transform="rotate(20 700 120)"/>
+                            <ellipse cx="705" cy="140" rx="20" ry="28" fill="#ff6b9d" opacity="0.8" transform="rotate(-20 705 140)"/>
+                            
+                            <text x="680" y="180" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">Adult</text>
+                        </g>
+
+                        <!-- Cycle arrow back -->
+                        <g class="arrow">
+                            <path d="M 720 110 Q 750 90, 750 50 Q 750 20, 400 20 Q 50 20, 50 90" 
+                                  fill="none" stroke="#667eea" stroke-width="3" stroke-dasharray="8,4"/>
+                            <polygon points="50,90 55,80 45,80" fill="#667eea"/>
+                        </g>
+                    </g>
+                `
+            }
+        ];
+
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const stageSvg = document.getElementById('stageSvg');
+        const stageInfo = document.getElementById('stageInfo');
+        const stageContainer = document.getElementById('stageContainer');
+        const progressFill = document.getElementById('progressFill');
+
+        function updateStage() {
+            const stage = stages[currentStage];
+            
+            stageSvg.innerHTML = stage.svg;
+            
+            if (currentStage === 4) {
+                stageSvg.setAttribute('viewBox', '0 0 800 200');
+                stageSvg.classList.add('summary-view');
+            } else {
+                stageSvg.setAttribute('viewBox', '0 0 300 250');
+                stageSvg.classList.remove('summary-view');
+            }
+            
+            stageInfo.innerHTML = `
+                <h2>${stage.emoji} ${stage.title}</h2>
+                <p>${stage.description}</p>
+            `;
+
+            for (let i = 0; i < totalStages; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < currentStage) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (i === currentStage) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            }
+
+            progressFill.style.width = `${(currentStage / (totalStages - 1)) * 100}%`;
+
+            btnPrev.disabled = currentStage === 0;
+            
+            if (currentStage === totalStages - 1) {
+                btnNext.textContent = '🔄 Restart';
+                btnNext.className = 'btn-restart';
+                createConfetti();
+            } else {
+                btnNext.textContent = 'Next →';
+                btnNext.className = 'btn-next';
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#ff6b9d', '#8bc34a', '#90caf9'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    stageContainer.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        btnNext.addEventListener('click', () => {
+            if (currentStage === totalStages - 1) {
+                currentStage = 0;
+            } else {
+                currentStage++;
+            }
+            updateStage();
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (currentStage > 0) {
+                currentStage--;
+                updateStage();
+            }
+        });
+
+        updateStage();
+    </script>
+</body>
+</html>
